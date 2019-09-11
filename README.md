@@ -1,1 +1,1 @@
-Simple "html5 canvas" tetris game
+Simple html5 canvas tetris game implemented with GWT.

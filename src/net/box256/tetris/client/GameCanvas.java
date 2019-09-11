@@ -17,6 +17,8 @@ class GameCanvas {
 
     private final int GAME_PIXEL_SIZE = 6;
     private final int BLOCK_SIZE = 5;
+    private final int BLOCKS_WIDTH = 12;
+    private final int BLOCKS_HEIGHT = 21;
 
     private final Context2d context;
     private GameEngine engine;
@@ -27,14 +29,14 @@ class GameCanvas {
 
     GameCanvas(final Canvas canvas) {
 
-        adjustToWindowSize(canvas);
+        adjustBrowserCanvasSize(canvas);
 
         context = canvas.getContext2d();
 
         startNewGame();
 
         Window.addResizeHandler(event -> {
-            adjustToWindowSize(canvas);
+            adjustBrowserCanvasSize(canvas);
             drawAll();
         });
 
@@ -56,7 +58,7 @@ class GameCanvas {
     }
 
     private void startNewGame() {
-        engine = new GameEngine(12, 21);
+        engine = new GameEngine(BLOCKS_WIDTH, BLOCKS_HEIGHT);
 
         drawAll();
 
@@ -69,9 +71,9 @@ class GameCanvas {
         }, 500);
     }
 
-    private void adjustToWindowSize(Canvas canvas) {
-        widthCanvasPixels = Window.getClientWidth();
-        heightCanvasPixels = Window.getClientHeight();
+    private void adjustBrowserCanvasSize(Canvas canvas) {
+        widthCanvasPixels = (BLOCKS_WIDTH + 18) * BLOCK_SIZE * GAME_PIXEL_SIZE;
+        heightCanvasPixels = (BLOCKS_HEIGHT + 8) * BLOCK_SIZE * GAME_PIXEL_SIZE;
 
         canvas.setPixelSize(widthCanvasPixels, heightCanvasPixels);
         canvas.setCoordinateSpaceWidth(widthCanvasPixels);
