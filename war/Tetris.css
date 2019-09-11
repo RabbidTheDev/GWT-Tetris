@@ -1,0 +1,12 @@
+html {
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+canvas:hover {
+    cursor: default;
+}
+
+.GameCanvas {
+    display: block;
+    margin: auto;
+}
