@@ -30,7 +30,7 @@ public class TextTest extends TestCase {
         for (Pixel pixel : pixels) {
             controlSum = controlSum + pixel.x + pixel.y;
         }
-        assertEquals("Visual check should is not correct with control sum value", 51298, controlSum);
+        assertEquals("Control sum check failed", 51298, controlSum);
     }
 
 }
