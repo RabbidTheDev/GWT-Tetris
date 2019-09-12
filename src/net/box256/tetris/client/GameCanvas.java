@@ -41,8 +41,8 @@ class GameCanvas {
         });
 
         canvas.addClickHandler(event -> {
-            final int x = event.getClientX() / GAME_PIXEL_SIZE;
-            final int y = event.getClientY() / GAME_PIXEL_SIZE;
+            final int x = event.getX() / GAME_PIXEL_SIZE;
+            final int y = event.getY() / GAME_PIXEL_SIZE;
             //drawText(new PixelText("X", Color.GREY.code, 1.0), x - 2, y - 2);
 
             //invoke correspondent button
