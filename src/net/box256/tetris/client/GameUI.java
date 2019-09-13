@@ -4,12 +4,16 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RootPanel;
 import net.box256.tetris.client.game.Color;
 import net.box256.tetris.client.game.GameBlock;
 import net.box256.tetris.client.game.GameEngine;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -25,16 +29,23 @@ class GameUI {
     private int widthCanvasPixels;
     private int heightCanvasPixels;
 
-    //todo: refactor game controls
-
-    private List<PixelButton> buttons = new ArrayList<>();
     private Boolean pause = false;
+    private final Button buttonGame;
 
-    GameUI(final Canvas canvas) {
+    private GameUI(final Canvas canvas) {
 
         adjustBrowserCanvasSize(canvas);
 
         context = canvas.getContext2d();
+
+        //todo: nice symbols for buttons
+        //todo: make buttons and canvas unfocusable tabIndex="-1"
+
+        buttonGame = new Button(">|");
+        final Button buttonRotateRight = new Button("RR");
+        final Button buttonMoveLeft = new Button("<<");
+        final Button buttonDrop = new Button("DROP");
+        final Button buttonMoveRight = new Button(">>");
 
         startNewGame();
 
@@ -43,21 +54,72 @@ class GameUI {
             drawAll();
         });
 
-        canvas.addClickHandler(event -> {
-            final int x = event.getX() / GAME_PIXEL_SIZE;
-            final int y = event.getY() / GAME_PIXEL_SIZE;
-            //drawText(new PixelText("X", Color.GREY.code, 1.0), x - 2, y - 2);
-
-            //invoke correspondent button
-            for (PixelButton pixelButton : buttons) {
-                if ((pixelButton.xOffset <= x) && ((pixelButton.xOffset + pixelButton.width()) >= x)) {
-                    if ((pixelButton.yOffset <= y) && ((pixelButton.yOffset + pixelButton.height()) >= y)) {
-                        pixelButton.onClick();
-                    }
+        Event.addNativePreviewHandler(event -> {
+            final int keyCode = event.getNativeEvent().getKeyCode();
+            if (keyCode >= 32 && keyCode <= 40 && event.getTypeInt() == 128) {
+                if (keyCode == 37) {
+                    GameUI.this.keyPress(GameUI.KEY.LEFT);
+                } else if (keyCode == 38) {
+                    GameUI.this.keyPress(GameUI.KEY.UP);
+                } else if (keyCode == 39) {
+                    GameUI.this.keyPress(GameUI.KEY.RIGHT);
+                } else if (keyCode == 40) {
+                    GameUI.this.keyPress(GameUI.KEY.DOWN);
+                } else if (keyCode == 32) {
+                    GameUI.this.keyPress(GameUI.KEY.SPACE);
                 }
             }
-
         });
+        final FlowPanel buttonsPanel1 = new FlowPanel();
+        buttonsPanel1.addStyleName("ButtonsPanel");
+        RootPanel.get().add(buttonsPanel1);
+
+        final FlowPanel buttonsPanel2 = new FlowPanel();
+        buttonsPanel2.addStyleName("ButtonsPanel");
+        RootPanel.get().add(buttonsPanel2);
+
+        final Button buttonRotateLeft = new Button("RL");
+        buttonRotateLeft.addStyleName("ActionButton");
+        buttonsPanel1.add(buttonRotateLeft);
+
+        buttonGame.addStyleName("ActionButton");
+        buttonsPanel1.add(buttonGame);
+
+        buttonRotateRight.addStyleName("ActionButton");
+        buttonsPanel1.add(buttonRotateRight);
+
+        buttonMoveLeft.addStyleName("ActionButton");
+        buttonsPanel2.add(buttonMoveLeft);
+
+        buttonDrop.addStyleName("ActionButton");
+        buttonsPanel2.add(buttonDrop);
+
+        buttonMoveRight.addStyleName("ActionButton");
+        buttonsPanel2.add(buttonMoveRight);
+
+        buttonGame.addClickHandler(event -> {
+            if (engine.isGameOver()) {
+                startNewGame();
+            } else {
+                pause = !pause;
+                drawAll();
+            }
+        });
+
+        buttonRotateLeft.addClickHandler(event -> GameUI.this.actionRotateDown());
+        buttonRotateRight.addClickHandler(event -> GameUI.this.actionRotateUp());
+        buttonMoveLeft.addClickHandler(event -> GameUI.this.actionMoveLeft());
+        buttonMoveRight.addClickHandler(event -> GameUI.this.actionMoveRight());
+        buttonDrop.addClickHandler(event -> GameUI.this.actionDrop());
+
+        final Label keysInfoLabel = new Label("Use \"arrows\" and \"space\" keys to control the game from the keyboard");
+        keysInfoLabel.addStyleName("InfoLabel");
+        RootPanel.get().add(keysInfoLabel);
+
+    }
+
+    static void createUI(final Canvas canvas) {
+        new GameUI(canvas);
     }
 
     private void startNewGame() {
@@ -75,8 +137,8 @@ class GameUI {
     }
 
     private void adjustBrowserCanvasSize(Canvas canvas) {
-        widthCanvasPixels = (BLOCKS_WIDTH + 18) * BLOCK_SIZE * GAME_PIXEL_SIZE;
-        heightCanvasPixels = (BLOCKS_HEIGHT + 8) * BLOCK_SIZE * GAME_PIXEL_SIZE;
+        widthCanvasPixels = (BLOCKS_WIDTH + 2) * BLOCK_SIZE * GAME_PIXEL_SIZE;
+        heightCanvasPixels = (BLOCKS_HEIGHT + 5) * BLOCK_SIZE * GAME_PIXEL_SIZE;
 
         canvas.setPixelSize(widthCanvasPixels, heightCanvasPixels);
         canvas.setCoordinateSpaceWidth(widthCanvasPixels);
@@ -85,7 +147,6 @@ class GameUI {
 
     private void drawAll() {
         context.clearRect(0, 0, widthCanvasPixels, heightCanvasPixels);
-        buttons.clear();
 
         drawMatrixArea();
 
@@ -104,130 +165,40 @@ class GameUI {
         PixelText scoreText = new PixelText("SCORE " + engine.score(), Color.GREY.code, 1);
         drawText(scoreText, centeredXPosition(scoreText.width()), scoreYOffset);
 
-        PixelButton gameButton;
         if (engine.isGameOver()) {
+            buttonGame.setText("Start");
+
             PixelText gameOverText = new PixelText("GAME OVER!", "#FF0000", 1);
             drawText(gameOverText, centeredXPosition(gameOverText.width()), textVerticalPadding * 2 + tetrisTitle.height());
 
-            gameButton = new PixelButton("START", Color.BLUE.code, 1) {
-                @Override
-                public void onClick() {
-                    startNewGame();
-                }
-            };
+        } else if (pause) {
+            buttonGame.setText("Continue");
         } else {
-            gameButton = new PixelButton(pause ? "CONTINUE" : "PAUSE", Color.GREY.code, 1) {
-                @Override
-                public void onClick() {
-                    pause = (!pause);
-                    drawAll();
-                }
-            };
+            buttonGame.setText("Pause");
         }
-        gameButton.xOffset = centeredXPosition(gameButton.width());
-        gameButton.yOffset = scoreYOffset + textVerticalPadding + scoreText.height();
-        drawButton(gameButton);
-        buttons.add(gameButton);
-
-        // move buttons
-        final int moveButtonsYPosition = gameAreaYOffset + (engine.heightBlocks() * BLOCK_SIZE / 2);
-
-        final PixelButton moveLeftButton = new PixelButton("LEFT", "#000000", 1) {
-            @Override
-            public void onClick() {
-                moveLeft();
-            }
-        };
-
-        moveLeftButton.xOffset = gameAreaXOffset - moveLeftButton.width() - 2;
-        moveLeftButton.yOffset = moveButtonsYPosition;
-        drawButton(moveLeftButton);
-        buttons.add(moveLeftButton);
-
-        final PixelButton moveRightButton = new PixelButton("RIGHT", "#000000", 1) {
-            @Override
-            public void onClick() {
-                moveRight();
-            }
-        };
-        moveRightButton.xOffset = gameAreaXOffset + (engine.widthBlocks() * BLOCK_SIZE) + 2;
-        moveRightButton.yOffset = moveButtonsYPosition;
-        drawButton(moveRightButton);
-        buttons.add(moveRightButton);
-
-        // rotate buttons
-        final int rotateButtonsYPosition = gameAreaYOffset + (engine.heightBlocks() * BLOCK_SIZE / 2) - (BLOCK_SIZE * 3);
-
-        final PixelButton rotateLeftButton = new PixelButton("ROTATE", "#000000", 1) {
-            @Override
-            public void onClick() {
-                rotateDown();
-            }
-        };
-
-        rotateLeftButton.xOffset = gameAreaXOffset - rotateLeftButton.width() - 2;
-        rotateLeftButton.yOffset = rotateButtonsYPosition;
-        drawButton(rotateLeftButton);
-        buttons.add(rotateLeftButton);
-
-        final PixelButton rotateRightButton = new PixelButton("ROTATE", "#000000", 1) {
-            @Override
-            public void onClick() {
-                rotateUp();
-            }
-        };
-        rotateRightButton.xOffset = gameAreaXOffset + (engine.widthBlocks() * BLOCK_SIZE) + 2;
-        rotateRightButton.yOffset = rotateButtonsYPosition;
-        drawButton(rotateRightButton);
-        buttons.add(rotateRightButton);
-
-        final int dropButtonsYPosition = gameAreaYOffset + (engine.heightBlocks() * BLOCK_SIZE / 2) + (BLOCK_SIZE * 3);
-
-        final PixelButton dropLeftButton = new PixelButton("DROP", "#000000", 1) {
-            @Override
-            public void onClick() {
-                drop();
-            }
-        };
-
-        dropLeftButton.xOffset = gameAreaXOffset - dropLeftButton.width() - 2;
-        dropLeftButton.yOffset = dropButtonsYPosition;
-        drawButton(dropLeftButton);
-        buttons.add(dropLeftButton);
-
-        final PixelButton dropRightButton = new PixelButton("DROP", "#000000", 1) {
-            @Override
-            public void onClick() {
-                drop();
-            }
-        };
-        dropRightButton.xOffset = gameAreaXOffset + (engine.widthBlocks() * BLOCK_SIZE) + 2;
-        dropRightButton.yOffset = dropButtonsYPosition;
-        drawButton(dropRightButton);
-        buttons.add(dropRightButton);
     }
 
-    void drop() {
+    private void actionDrop() {
         engine.drop();
         drawAll();
     }
 
-    void rotateUp() {
+    private void actionRotateUp() {
         engine.rotateUp();
         drawAll();
     }
 
-    void rotateDown() {
+    private void actionRotateDown() {
         engine.rotateDown();
         drawAll();
     }
 
-    void moveLeft() {
+    private void actionMoveLeft() {
         engine.moveLeft();
         drawAll();
     }
 
-    void moveRight() {
+    private void actionMoveRight() {
         engine.moveRight();
         drawAll();
     }
@@ -239,11 +210,6 @@ class GameUI {
     private void drawText(PixelText pixelText, int xOffset, int yOffset) {
         final List<Pixel> pixels = pixelText.pixels();
         pixels.forEach((pixel) -> drawPixel(pixel, xOffset, yOffset));
-    }
-
-    private void drawButton(PixelButton pixelButton) {
-        final List<Pixel> pixels = pixelButton.pixels();
-        pixels.forEach((pixel) -> drawPixel(pixel, pixelButton.xOffset, pixelButton.yOffset));
     }
 
     private void drawBlock(GameBlock block, int xOffset, int yOffset) {
@@ -283,33 +249,22 @@ class GameUI {
         context.fillRect(absoluteX, absoluteY, GAME_PIXEL_SIZE - 1, GAME_PIXEL_SIZE - 1);
     }
 
-    void keyPress(KEY key) {
+    private void keyPress(KEY key) {
 
-        boolean changed = false;
         if (key == KEY.UP) {
-            engine.rotateUp();
-            changed = true;
+            actionRotateUp();
         } else if (key == KEY.DOWN) {
-            engine.rotateDown();
-            changed = true;
+            actionRotateDown();
         } else if (key == KEY.LEFT) {
-            engine.moveLeft();
-            changed = true;
+            actionMoveLeft();
         } else if (key == KEY.RIGHT) {
-            engine.moveRight();
-            changed = true;
+            actionMoveRight();
         } else if (key == KEY.SPACE) {
-            engine.drop();
-            changed = true;
+            actionDrop();
         }
-
-        if (changed) {
-            drawAll();
-        }
-
     }
 
-    enum KEY {
+    private enum KEY {
         UP, DOWN, LEFT, RIGHT, SPACE
     }
 }

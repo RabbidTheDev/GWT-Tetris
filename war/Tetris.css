@@ -24,8 +24,9 @@ canvas:hover {
 }
 
 .ActionButton {
-    height: 6em;
-    width: 6em;
+    height: 4em;
+    width: 5em;
+    font-size: x-large;
     margin-left: 0.5em;
     margin-right: 0.5em;
 }
