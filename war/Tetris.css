@@ -10,3 +10,22 @@ canvas:hover {
     display: block;
     margin: auto;
 }
+
+.InfoLabel {
+    margin-top: 1em;
+    text-align: center;
+    color: gray;
+    font-style: italic;
+}
+
+.ButtonsPanel {
+    margin-top: 1em;
+    text-align: center;
+}
+
+.ActionButton {
+    height: 6em;
+    width: 6em;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}

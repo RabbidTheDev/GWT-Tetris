@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-class GameCanvas {
+class GameUI {
 
     private final int GAME_PIXEL_SIZE = 6;
     private final int BLOCK_SIZE = 5;
@@ -24,10 +24,13 @@ class GameCanvas {
     private GameEngine engine;
     private int widthCanvasPixels;
     private int heightCanvasPixels;
+
+    //todo: refactor game controls
+
     private List<PixelButton> buttons = new ArrayList<>();
     private Boolean pause = false;
 
-    GameCanvas(final Canvas canvas) {
+    GameUI(final Canvas canvas) {
 
         adjustBrowserCanvasSize(canvas);
 
@@ -132,8 +135,7 @@ class GameCanvas {
         final PixelButton moveLeftButton = new PixelButton("LEFT", "#000000", 1) {
             @Override
             public void onClick() {
-                engine.moveLeft();
-                drawAll();
+                moveLeft();
             }
         };
 
@@ -145,8 +147,7 @@ class GameCanvas {
         final PixelButton moveRightButton = new PixelButton("RIGHT", "#000000", 1) {
             @Override
             public void onClick() {
-                engine.moveRight();
-                drawAll();
+                moveRight();
             }
         };
         moveRightButton.xOffset = gameAreaXOffset + (engine.widthBlocks() * BLOCK_SIZE) + 2;
@@ -160,8 +161,7 @@ class GameCanvas {
         final PixelButton rotateLeftButton = new PixelButton("ROTATE", "#000000", 1) {
             @Override
             public void onClick() {
-                engine.rotateDown();
-                drawAll();
+                rotateDown();
             }
         };
 
@@ -173,8 +173,7 @@ class GameCanvas {
         final PixelButton rotateRightButton = new PixelButton("ROTATE", "#000000", 1) {
             @Override
             public void onClick() {
-                engine.rotateUp();
-                drawAll();
+                rotateUp();
             }
         };
         rotateRightButton.xOffset = gameAreaXOffset + (engine.widthBlocks() * BLOCK_SIZE) + 2;
@@ -187,8 +186,7 @@ class GameCanvas {
         final PixelButton dropLeftButton = new PixelButton("DROP", "#000000", 1) {
             @Override
             public void onClick() {
-                engine.drop();
-                drawAll();
+                drop();
             }
         };
 
@@ -200,14 +198,38 @@ class GameCanvas {
         final PixelButton dropRightButton = new PixelButton("DROP", "#000000", 1) {
             @Override
             public void onClick() {
-                engine.drop();
-                drawAll();
+                drop();
             }
         };
         dropRightButton.xOffset = gameAreaXOffset + (engine.widthBlocks() * BLOCK_SIZE) + 2;
         dropRightButton.yOffset = dropButtonsYPosition;
         drawButton(dropRightButton);
         buttons.add(dropRightButton);
+    }
+
+    void drop() {
+        engine.drop();
+        drawAll();
+    }
+
+    void rotateUp() {
+        engine.rotateUp();
+        drawAll();
+    }
+
+    void rotateDown() {
+        engine.rotateDown();
+        drawAll();
+    }
+
+    void moveLeft() {
+        engine.moveLeft();
+        drawAll();
+    }
+
+    void moveRight() {
+        engine.moveRight();
+        drawAll();
     }
 
     private int centeredXPosition(int gamePixelsWidth) {

@@ -4,13 +4,14 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 
 public class Tetris implements EntryPoint {
 
-    private static GameCanvas gameCanvas;
+    private static GameUI gameUI;
 
     public void onModuleLoad() {
 
@@ -24,27 +25,71 @@ public class Tetris implements EntryPoint {
         canvas.addStyleName("GameCanvas");
 
         RootPanel.get().add(canvas);
-        final HTML footerLabel = new HTML("<span style='color:gray; font-style: italic'> Use \"arrows\" and \"space\" keys to control the game </span>");
-        footerLabel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-        RootPanel.get().add(footerLabel);
-        gameCanvas = new GameCanvas(canvas);
+        gameUI = new GameUI(canvas);
 
         Event.addNativePreviewHandler(event -> {
 
             final int keyCode = event.getNativeEvent().getKeyCode();
             if (keyCode >= 32 && keyCode <= 40 && event.getTypeInt() == 128) {
                 if (keyCode == 37) {
-                    gameCanvas.keyPress(GameCanvas.KEY.LEFT);
+                    gameUI.keyPress(GameUI.KEY.LEFT);
                 } else if (keyCode == 38) {
-                    gameCanvas.keyPress(GameCanvas.KEY.UP);
+                    gameUI.keyPress(GameUI.KEY.UP);
                 } else if (keyCode == 39) {
-                    gameCanvas.keyPress(GameCanvas.KEY.RIGHT);
+                    gameUI.keyPress(GameUI.KEY.RIGHT);
                 } else if (keyCode == 40) {
-                    gameCanvas.keyPress(GameCanvas.KEY.DOWN);
+                    gameUI.keyPress(GameUI.KEY.DOWN);
                 } else if (keyCode == 32) {
-                    gameCanvas.keyPress(GameCanvas.KEY.SPACE);
+                    gameUI.keyPress(GameUI.KEY.SPACE);
                 }
             }
         });
+        final FlowPanel buttonsPanel1 = new FlowPanel();
+        buttonsPanel1.addStyleName("ButtonsPanel");
+        RootPanel.get().add(buttonsPanel1);
+
+        final FlowPanel buttonsPanel2 = new FlowPanel();
+        buttonsPanel2.addStyleName("ButtonsPanel");
+        RootPanel.get().add(buttonsPanel2);
+
+        final Button buttonRotateLeft = new Button("RL");
+        buttonRotateLeft.addStyleName("ActionButton");
+        buttonsPanel1.add(buttonRotateLeft);
+
+        final Button buttonStart = new Button(">|");
+        buttonStart.addStyleName("ActionButton");
+        buttonsPanel1.add(buttonStart);
+
+        final Button buttonRotateRight = new Button("RR");
+        buttonRotateRight.addStyleName("ActionButton");
+        buttonsPanel1.add(buttonRotateRight);
+
+        final Button buttonMoveLeft = new Button("<<");
+        buttonMoveLeft.addStyleName("ActionButton");
+        buttonsPanel2.add(buttonMoveLeft);
+
+        final Button buttonDrop = new Button("DROP");
+        buttonDrop.addStyleName("ActionButton");
+        buttonsPanel2.add(buttonDrop);
+
+        final Button buttonMoveRight = new Button(">>");
+        buttonMoveRight.addStyleName("ActionButton");
+        buttonsPanel2.add(buttonMoveRight);
+
+        buttonStart.setEnabled(false);
+
+        buttonStart.addClickHandler(event -> {
+            //not implemented yet
+        });
+        buttonRotateLeft.addClickHandler(event -> gameUI.rotateDown());
+        buttonRotateRight.addClickHandler(event -> gameUI.rotateUp());
+        buttonMoveLeft.addClickHandler(event -> gameUI.moveLeft());
+        buttonMoveRight.addClickHandler(event -> gameUI.moveRight());
+        buttonDrop.addClickHandler(event -> gameUI.drop());
+
+        final Label keysInfoLabel = new Label("Use \"arrows\" and \"space\" keys to control the game from the keyboard");
+        keysInfoLabel.addStyleName("InfoLabel");
+        RootPanel.get().add(keysInfoLabel);
+
     }
 }
