@@ -39,7 +39,7 @@ class GameUI {
         context = canvas.getContext2d();
 
         //todo: nice symbols for buttons
-        //todo: make buttons and canvas unfocusable tabIndex="-1"
+        //todo: optimize for mobile
 
         buttonGame = new Button(">|");
         final Button buttonRotateRight = new Button("RR");
@@ -58,14 +58,19 @@ class GameUI {
             final int keyCode = event.getNativeEvent().getKeyCode();
             if (keyCode >= 32 && keyCode <= 40 && event.getTypeInt() == 128) {
                 if (keyCode == 37) {
+                    event.cancel();
                     GameUI.this.keyPress(GameUI.KEY.LEFT);
                 } else if (keyCode == 38) {
+                    event.cancel();
                     GameUI.this.keyPress(GameUI.KEY.UP);
                 } else if (keyCode == 39) {
+                    event.cancel();
                     GameUI.this.keyPress(GameUI.KEY.RIGHT);
                 } else if (keyCode == 40) {
+                    event.cancel();
                     GameUI.this.keyPress(GameUI.KEY.DOWN);
                 } else if (keyCode == 32) {
+                    event.cancel();
                     GameUI.this.keyPress(GameUI.KEY.SPACE);
                 }
             }
