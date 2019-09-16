@@ -38,14 +38,14 @@ class GameUI {
 
         context = canvas.getContext2d();
 
-        //todo: nice symbols for buttons
         //todo: optimize for mobile
 
-        buttonGame = new Button(">|");
-        final Button buttonRotateRight = new Button("RR");
-        final Button buttonMoveLeft = new Button("<<");
-        final Button buttonDrop = new Button("DROP");
-        final Button buttonMoveRight = new Button(">>");
+        buttonGame = new Button("Play");
+        final Button buttonRotateLeft = new Button("&#10226;");
+        final Button buttonRotateRight = new Button("&#11118;");
+        final Button buttonMoveLeft = new Button("&#11104;");
+        final Button buttonMoveRight = new Button("&#11106;");
+        final Button buttonDrop = new Button("&#11123;");
 
         startNewGame();
 
@@ -83,7 +83,6 @@ class GameUI {
         buttonsPanel2.addStyleName("ButtonsPanel");
         RootPanel.get().add(buttonsPanel2);
 
-        final Button buttonRotateLeft = new Button("RL");
         buttonRotateLeft.addStyleName("ActionButton");
         buttonsPanel1.add(buttonRotateLeft);
 
@@ -171,15 +170,15 @@ class GameUI {
         drawText(scoreText, centeredXPosition(scoreText.width()), scoreYOffset);
 
         if (engine.isGameOver()) {
-            buttonGame.setText("Start");
+            buttonGame.setHTML("&#11208;");
 
             PixelText gameOverText = new PixelText("GAME OVER!", "#FF0000", 1);
             drawText(gameOverText, centeredXPosition(gameOverText.width()), textVerticalPadding * 2 + tetrisTitle.height());
 
         } else if (pause) {
-            buttonGame.setText("Continue");
+            buttonGame.setHTML("&#11208;");
         } else {
-            buttonGame.setText("Pause");
+            buttonGame.setHTML("&#10073;&#10073;");
         }
     }
 
