@@ -27,6 +27,8 @@ canvas:hover {
     height: 3em;
     width: 4em;
     font-size: xx-large;
+    font-weight: bold;
     margin-left: 0.5em;
     margin-right: 0.5em;
+    touch-action: manipulation;
 }

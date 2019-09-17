@@ -38,14 +38,14 @@ class GameUI {
 
         context = canvas.getContext2d();
 
-        //todo: optimize for mobile
+        //todo: optimize sizes for mobile
 
         buttonGame = new Button("Play");
-        final Button buttonRotateLeft = new Button("&#10226;");
-        final Button buttonRotateRight = new Button("&#11118;");
-        final Button buttonMoveLeft = new Button("&#11104;");
-        final Button buttonMoveRight = new Button("&#11106;");
-        final Button buttonDrop = new Button("&#11123;");
+        final Button buttonRotateLeft = new Button("&#8634;");
+        final Button buttonRotateRight = new Button("&#8635;");
+        final Button buttonMoveLeft = new Button("&#8612;");
+        final Button buttonMoveRight = new Button("&#8614;");
+        final Button buttonDrop = new Button("&#8615;");
 
         startNewGame();
 
@@ -170,13 +170,13 @@ class GameUI {
         drawText(scoreText, centeredXPosition(scoreText.width()), scoreYOffset);
 
         if (engine.isGameOver()) {
-            buttonGame.setHTML("&#11208;");
+            buttonGame.setHTML("&#9205;");
 
             PixelText gameOverText = new PixelText("GAME OVER!", "#FF0000", 1);
             drawText(gameOverText, centeredXPosition(gameOverText.width()), textVerticalPadding * 2 + tetrisTitle.height());
 
         } else if (pause) {
-            buttonGame.setHTML("&#11208;");
+            buttonGame.setHTML("&#9205;");
         } else {
             buttonGame.setHTML("&#10073;&#10073;");
         }
