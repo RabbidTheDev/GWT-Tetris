@@ -19,7 +19,7 @@ import java.util.Set;
 
 class GameUI {
 
-    private final int GAME_PIXEL_SIZE = 6;
+    private int GAME_PIXEL_SIZE = 6;
     private final int BLOCK_SIZE = 5;
     private final int BLOCKS_WIDTH = 12;
     private final int BLOCKS_HEIGHT = 21;
@@ -37,8 +37,6 @@ class GameUI {
         adjustBrowserCanvasSize(canvas);
 
         context = canvas.getContext2d();
-
-        //todo: optimize sizes for mobile
 
         buttonGame = new Button("Play");
         final Button buttonRotateLeft = new Button("&#8634;");
@@ -141,6 +139,17 @@ class GameUI {
     }
 
     private void adjustBrowserCanvasSize(Canvas canvas) {
+        int clientWidth = Window.getClientWidth();
+        int pixelDivider = 330; // desktop
+
+        if (Window.getClientHeight() > Window.getClientWidth()) { //portrait
+            pixelDivider = 90; // mobile
+        }
+        GAME_PIXEL_SIZE = clientWidth / pixelDivider;
+        if (GAME_PIXEL_SIZE < 2) {
+            GAME_PIXEL_SIZE = 2;
+        }
+
         widthCanvasPixels = (BLOCKS_WIDTH + 2) * BLOCK_SIZE * GAME_PIXEL_SIZE;
         heightCanvasPixels = (BLOCKS_HEIGHT + 5) * BLOCK_SIZE * GAME_PIXEL_SIZE;
 
@@ -170,15 +179,15 @@ class GameUI {
         drawText(scoreText, centeredXPosition(scoreText.width()), scoreYOffset);
 
         if (engine.isGameOver()) {
-            buttonGame.setHTML("&#9205;");
+            buttonGame.setHTML("Start");
 
             PixelText gameOverText = new PixelText("GAME OVER!", "#FF0000", 1);
             drawText(gameOverText, centeredXPosition(gameOverText.width()), textVerticalPadding * 2 + tetrisTitle.height());
 
         } else if (pause) {
-            buttonGame.setHTML("&#9205;");
+            buttonGame.setHTML(">>");
         } else {
-            buttonGame.setHTML("&#10073;&#10073;");
+            buttonGame.setHTML("||");
         }
     }
 
